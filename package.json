@@ -13,7 +13,7 @@
     "data:destroy": "node backend/seeder.js -d",
     "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
-  "author": "Emre Karayaman",
+  "author": "GROUPPROJECT",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
