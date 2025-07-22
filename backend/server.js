@@ -8,6 +8,7 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/user.routes.js';
 import authRoutes from './routes/auth.routes.js'
 import productRoutes from './routes/product.routes.js'
+import uploadRoutes from './routes/upload.routes.js';
 
 const port = process.env.PORT || 6000;
 
@@ -23,6 +24,7 @@ app.use(cookieParser());
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
+app.use('/api/upload', uploadRoutes);
 
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

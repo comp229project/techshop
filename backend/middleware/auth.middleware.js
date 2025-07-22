@@ -2,19 +2,15 @@ import jwt from 'jsonwebtoken';
 import asyncHandler from './asyncHandler.js';
 import User from '../models/user.model.js';
 
-// Protect routes
 const protect = asyncHandler(async (req, res, next) => {
   let token;
 
-  // Check Authorization header
   if (
     req.headers.authorization &&
     req.headers.authorization.startsWith('Bearer ')
   ) {
     token = req.headers.authorization.split(' ')[1];
-  }
-  // If not in headers, check cookies
-  else if (req.cookies.jwt) {
+  } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
   }
 
@@ -25,7 +21,10 @@ const protect = asyncHandler(async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
+
+    // ✅ FIXED HERE
+    req.user = await User.findById(decoded.userId).select('-password');
+
     next();
   } catch (error) {
     console.error(error);
@@ -33,6 +32,7 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new Error('Not authorized, token failed');
   }
 });
+
 
 // Admin middleware
 const admin = (req, res, next) => {

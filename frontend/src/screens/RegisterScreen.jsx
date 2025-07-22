@@ -40,8 +40,14 @@ const RegisterScreen = () => {
     } else {
       try {
         const res = await register({ name, email, password }).unwrap();
-        dispatch(setCredentials({ ...res }));
+        dispatch(setCredentials({
+          ...res.user,
+          token: res.token
+        }));
+        toast.success('Registered successfully');
         navigate(redirect);
+
+
       } catch (error) {
         toast.error(error?.data?.message || error.error);
       }

@@ -11,13 +11,13 @@ const authUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (user && (await user.matchPassword(password))) {
-    generateToken(res, user._id);
-
+    const token = generateToken(res, user._id); // ✅ Generate it
     res.status(200).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      token, // ✅ Return it here
     });
   } else {
     res.status(401);
@@ -25,15 +25,11 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
+
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
-  const userExists = await User.findOne({
-    email,
-  });
+  const userExists = await User.findOne({ email });
 
   if (userExists) {
     res.status(400);
@@ -47,19 +43,23 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    generateToken(res, user._id);
-
+    const token = generateToken(res, user._id);
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+      token,
     });
   } else {
     res.status(400);
     throw new Error('Invalid user data');
   }
 });
+
+
 
 // @desc    Logout user / clear cookie
 // @route   POST /api/users/logout

@@ -11,15 +11,19 @@ import {
   useUpdateUserMutation,
 } from '../../slices/usersApiSlice';
 import Meta from '../../components/Meta';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../../slices/authSlice';
 
 const UserEditScreen = () => {
   const { id: userId } = useParams();
-
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const { userInfo } = useSelector((state) => state.auth);
 
   const {
     data: user,
@@ -41,10 +45,22 @@ const UserEditScreen = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
-      await updateUser({ userId, name, email, isAdmin });
+      const updatedUser = await updateUser({ userId, name, email, isAdmin }).unwrap();
       toast.success('User updated successfully');
-      refetch();
-      navigate('/admin/userlist');
+
+      // ✅ Logout if current user updates their own admin status to false
+      if (
+        userInfo._id === userId &&
+        userInfo.isAdmin === true &&
+        updatedUser.isAdmin === false
+      ) {
+        dispatch(logout());
+        navigate('/');
+      } else {
+        refetch();
+        navigate('/admin/userlist');
+      }
+
     } catch (error) {
       toast.error(error?.data?.message || error.error);
     }
@@ -87,6 +103,7 @@ const UserEditScreen = () => {
                 onChange={(e) => setEmail(e.target.value)}
               ></Form.Control>
             </Form.Group>
+
             <Form.Group controlId='isAdmin' className='my-2'>
               <Form.Check
                 type='checkbox'
@@ -95,6 +112,7 @@ const UserEditScreen = () => {
                 onChange={(e) => setIsAdmin(e.target.checked)}
               ></Form.Check>
             </Form.Group>
+
             <Button type='submit' variant='primary' className='my-2'>
               Update
             </Button>

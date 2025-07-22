@@ -12,12 +12,17 @@ import {
   useUploadProductImageMutation,
 } from '../../slices/productsApiSlice';
 import Meta from '../../components/Meta';
+import { useSelector } from 'react-redux';
 
 const ProductEditScreen = () => {
   const { id: productId } = useParams();
 
   const navigate = useNavigate();
 
+  // 🔍 Check if token is actually available
+  const { userInfo } = useSelector((state) => state.auth);
+  console.log('Redux Token:', userInfo?.token); // 🟡 Must NOT be undefined or null
+  
   const [name, setName] = useState('');
   const [price, setPrice] = useState(0);
   const [image, setImage] = useState('');
